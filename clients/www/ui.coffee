@@ -50,6 +50,21 @@ $ ->
                 sort: (array, column) ->
                     array = array.slice()
                     array.sort (a, b) -> a[column] < b[column] ? -1 : 1
+
+            computed:
+                buy_price: -> (Number @get "buy_price_str") or (@get("sputnik.books")[@get "current_ticker"]?.best_ask?.price) or 0
+                sell_price: -> (Number @get "sell_price_str") or (@get("sputnik.books")[@get "current_ticker"]?.best_bid?.price) or 0
+                buy_quantity: -> Number @get "buy_quantity_str"
+                sell_quantity: -> Number @get "sell_quantity_str"
+                can_buy: ->
+                    if Object.keys(@get("sputnik.books")).length == 0
+                        return false
+                    sputnik.canPlaceOrder @get("buy_quantity"), @get("buy_price"), @get("current_ticker"), "BUY"
+                can_sell: ->
+                    if Object.keys(@get("sputnik.books")).length == 0
+                        return false
+                    sputnik.canPlaceOrder @get("sell_quantity"), @get("sell_price"), @get("current_ticker"), "SELL"
+
             transitions:
                 show_chart: (t, ticker) ->
                     showChart(ticker, t.node.id, transition=t)
@@ -146,40 +161,6 @@ $ ->
                     address = JSON.stringify(address_obj)
 
                 sputnik.requestWithdrawal(ticker, amount, address)
-
-            buykey: (event) ->
-                buy_price_str = ractive.get("buy_price")
-                buy_quantity_str = ractive.get("buy_quantity")
-                if not buy_price_str
-                    buy_price_str = ractive.get("sputnik.books")[ractive.get("current_ticker")].best_ask.price
-                if not buy_quantity_str
-                    buy_quantity_str = "0"
-                buy_price = Number(buy_price_str)
-                buy_quantity = Number(buy_quantity_str)
-
-                if not sputnik.canPlaceOrder(buy_quantity, buy_price, ractive.get("current_ticker"), 'BUY')
-                    $("#buy_alert").show()
-                    $("#buyButton").hide()
-                else
-                    $("#buy_alert").hide()
-                    $("#buyButton").show()
-
-            sellkey: (event) ->
-                sell_price_str = ractive.get("sell_price")
-                sell_quantity_str = ractive.get("sell_quantity")
-                if not sell_price_str
-                    sell_price_str = ractive.get("sputnik.books")[ractive.get("current_ticker")].best_bid.price
-                if not sell_quantity_str == ''
-                    sell_quantity_str = "0"
-                sell_price = Number(sell_price_str)
-                sell_quantity = Number(sell_quantity_str)
-
-                if not sputnik.canPlaceOrder(sell_quantity, sell_price, ractive.get("current_ticker"), 'SELL')
-                    $("#sell_alert").show()
-                    $("#sellButton").hide()
-                else
-                    $("#sell_alert").hide()
-                    $("#sellButton").show()
 
             buy: (event) ->
                 event.original.preventDefault()
@@ -306,18 +287,14 @@ $ ->
             if old_ticker?
                 sputnik.unfollow old_ticker
             if new_ticker?
-                ractive.set "buy_price", ""
-                ractive.set "buy_quantity", ""
-                ractive.set "sell_price", ""
-                ractive.set "sell_quantity", ""
-                # TODO: change this to a template {{if}}
-                $("#buy_alert").hide()
-                $("#buyButton").show()
-                $("#sell_alert").hide()
-                $("#sellButton").show()
+                ractive.set "buy_price_str", ""
+                ractive.set "buy_quantity_str", ""
+                ractive.set "sell_price_str", ""
+                ractive.set "sell_quantity_str", ""
 
                 sputnik.openMarket new_ticker
                 showChart new_ticker
+
 
         window.ractive = ractive
 
