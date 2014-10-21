@@ -57,11 +57,11 @@ $ ->
                 buy_quantity: -> Number @get "buy_quantity_str"
                 sell_quantity: -> Number @get "sell_quantity_str"
                 can_buy: ->
-                    if Object.keys(@get("sputnik.books")).length == 0
+                    if Object.keys(@get("sputnik.books") or {}).length == 0
                         return false
                     sputnik.canPlaceOrder @get("buy_quantity"), @get("buy_price"), @get("current_ticker"), "BUY"
                 can_sell: ->
-                    if Object.keys(@get("sputnik.books")).length == 0
+                    if Object.keys(@get("sputnik.books") or {}).length == 0
                         return false
                     sputnik.canPlaceOrder @get("sell_quantity"), @get("sell_price"), @get("current_ticker"), "SELL"
 
