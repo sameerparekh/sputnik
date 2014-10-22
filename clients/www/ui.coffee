@@ -77,6 +77,15 @@ $ ->
         ractive.on
             switch_type: (event, type) ->
                 event.original.preventDefault()
+                # TEMPORARY HACK:
+                # This is here until I figure out why stuff is breaking.
+                # If current_ticker is not set first, the nav pills do not
+                #   highlight correctly.
+                # We did not need this in 0.5.8.
+                # Do not remove.
+                # Do not change the order either.
+                # -yury
+                ractive.set "current_ticker", ractive.get("sputnik.types")[type][0]
                 ractive.set "current_type", type
 
             switch_contract: (event) ->
@@ -312,9 +321,9 @@ $ ->
         tv = new window.TVFeed sputnik
         window.tv = tv
 
-        sputnik.on "log", (args...) -> ab.log args...
-        sputnik.on "warn", (args...) -> ab.log args...
-        sputnik.on "error", (args...) -> ab.log args...
+        sputnik.on "log", (args...) -> #ab.log args...
+        sputnik.on "warn", (args...) -> #ab.log args...
+        sputnik.on "error", (args...) -> #ab.log args...
 
         sputnik.on "open", () ->
             sputnik.log "open"
