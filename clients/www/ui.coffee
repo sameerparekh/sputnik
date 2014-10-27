@@ -56,8 +56,17 @@ $ ->
                     array.sort (a, b) -> a[column] < b[column] ? -1 : 1
 
             computed:
-                buy_price: -> (Number @get "buy_price_str") or (@get("sputnik.books")[@get "current_ticker"]?.best_ask?.price) or 0
-                sell_price: -> (Number @get "sell_price_str") or (@get("sputnik.books")[@get "current_ticker"]?.best_bid?.price) or 0
+                buy_price: ->
+                    if @get("buy_price_str") == ''
+                        (@get("sputnik.books")[@get "current_ticker"]?.best_ask?.price) or Infinity
+                    else
+                        (Number @get "buy_price_str")
+                sell_price: ->
+                    if @get("sell_price_str") == ''
+                        (@get("sputnik.books")[@get "current_ticker"]?.best_bid?.price) or 0
+                    else
+                        (Number @get "sell_price_str")
+
                 buy_quantity: -> Number @get "buy_quantity_str"
                 sell_quantity: -> Number @get "sell_quantity_str"
                 can_buy: ->
@@ -179,10 +188,6 @@ $ ->
                 buy_quantity = Number($('#buy_quantity').val())
                 buy_price_str = $("#buy_price").val()
 
-                if buy_quantity <= 0
-                    bootbox.alert "Invalid quantity"
-                    return true
-
                 if buy_price_str == ''
                     buy_price_str = ractive.get("sputnik.books")[ractive.get("current_ticker")].best_ask.price
                     bootbox.confirm "Placing order with price: #{buy_price_str}.\n\nAre you sure?", (result) =>
@@ -205,11 +210,6 @@ $ ->
                 event.original.preventDefault()
                 sell_quantity = Number($('#sell_quantity').val())
                 sell_price_str = $("#sell_price").val()
-
-
-                if sell_quantity <= 0
-                    bootbox.alert "Invalid quantity"
-                    return true
 
                 if sell_price_str == ''
                     sell_price_str = ractive.get("sputnik.books")[ractive.get("current_ticker")].best_bid.price

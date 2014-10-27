@@ -280,13 +280,13 @@
                                                         </div>
                                                     </div>
                                                     <div class="row spacer-top">
-                                                        {{#if can_buy and buy_price_valid and buy_quantity_valid}}
+                                                        {{#if can_buy && buy_price_valid && buy_quantity_valid}}
                                                         <a href="#" class="button-link-box3 button-place" id="buyButton" on-click="buy">Buy</a>
                                                         {{else}}
                                                         <div class="alert alert-danger text-center alert-warning" id="buy_alert">
-                                                            {{#if not can_buy}}Insufficient Funds{{/if}}
-                                                            {{#if not buy_price_valid}}Price Invalid{{/if}}
-                                                            {{#if not buy_quantity_valid}}Quantity Invalid{{/if}}                                                            
+                                                            {{#if ! can_buy}}Insufficient Funds<br/>{{/if}}
+                                                            {{#if ! buy_price_valid}}Price Invalid<br/>{{/if}}
+                                                            {{#if ! buy_quantity_valid}}Quantity Invalid<br/>{{/if}}
                                                         </div>
                                                         {{/if}}
                                                     </div>
@@ -305,16 +305,15 @@
                                                         <div class="col-sm-6">
                                                             <p>Price</p>
                                                             <form class="content-push7">
-                                                                    <input type="text" id="sell_price" name="price" class="form-control field" value="{{sell_price_str}}"
-                                                                           placeholder="{{format_price(current_ticker, sputnik.books[current_ticker].best_bid.price)}}" on-keyup="sellkey">
-                                                                    <input type="text" id="sell_price" name="price" class="form-control field" value="{{sell_price_str}}" placeholder="{{sputnik.books[current_ticker].best_bid.price}}">
+                                                                <input type="text" id="sell_price" name="price" class="form-control field" value="{{sell_price_str}}"
+                                                                       placeholder="{{format_price(current_ticker, sputnik.books[current_ticker].best_bid.price)}}">
                                                             </form>
                                                         </div>
                                                         <div class="col-sm-6 quantity">
                                                             <p>Quantity</p>
 
                                                             <form>
-                                                                    <input type="text" id="sell_quantity" name="quantity" class="form-control field" value="{{sell_quantity_str}}" on-keyup="sellkey">
+                                                                <input type="text" id="sell_quantity" name="quantity" class="form-control field" value="{{sell_quantity_str}}">
                                                             </form>
                                                         </div>
                                                     </div>
@@ -323,9 +322,9 @@
                                                         <a href="#" class="button-link-box3 button-place" id="sellButton" on-click="sell">Sell</a>
                                                         {{else}}
                                                         <div class="alert alert-danger text-center alert-warning" id="sell_alert">
-                                                            {{#if not can_sell}}Insufficient Funds{{/if}}
-                                                            {{#if not sell_price_valid}}Price Invalid{{/if}}
-                                                            {{#if not sell_quantity_valid}}Quantity Invalid{{/if}}                                                                                                                        
+                                                            {{#if ! can_sell}}Insufficient Funds{{/if}}
+                                                            {{#if ! sell_price_valid}}Price Invalid{{/if}}
+                                                            {{#if ! sell_quantity_valid}}Quantity Invalid{{/if}}
                                                         </div>
                                                         {{/if}}
                                                     </div>
