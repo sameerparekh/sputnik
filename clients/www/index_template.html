@@ -322,9 +322,9 @@
                                                         <a href="#" class="button-link-box3 button-place" id="sellButton" on-click="sell">Sell</a>
                                                         {{else}}
                                                         <div class="alert alert-danger text-center alert-warning" id="sell_alert">
-                                                            {{#if ! can_sell}}Insufficient Funds{{/if}}
-                                                            {{#if ! sell_price_valid}}Price Invalid{{/if}}
-                                                            {{#if ! sell_quantity_valid}}Quantity Invalid{{/if}}
+                                                            {{#if ! can_sell}}Insufficient Funds<br/>{{/if}}
+                                                            {{#if ! sell_price_valid}}Price Invalid<br/>{{/if}}
+                                                            {{#if ! sell_quantity_valid}}Quantity Invalid<br/>{{/if}}
                                                         </div>
                                                         {{/if}}
                                                     </div>
