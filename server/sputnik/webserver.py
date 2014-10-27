@@ -1000,7 +1000,7 @@ class PepsiColaServerProtocol(WampCraServerProtocol):
             d = dbpool.runQuery("SELECT contracts.ticker, journal.timestamp, posting.quantity, journal.type, posting.note "
                                 "FROM posting, journal, contracts WHERE posting.journal_id=journal.id AND "
                                 "posting.username=%s AND journal.timestamp>=%s AND journal.timestamp<=%s "
-                                "AND posting.contract_id=contracts.id",
+                                "AND posting.contract_id=contracts.id ORDER BY journal.timestamp",
                 (self.username, timestamp_to_dt(from_timestamp), timestamp_to_dt(to_timestamp)))
             d.addCallback(_gotTransactions)
             d.addErrback(_cb_error)
@@ -1634,7 +1634,7 @@ class TicketServer(Resource):
                         request.finish()
 
                     log.msg("Ticket created: %s" % ticket_number)
-                    d3 = self.administrator.register_support_ticket(username, nonce, 'Compliance', ticket_number)
+                    d3 = self.administrator.register_support_ticket(username, nonce, 'Compliance', str(ticket_number))
                     d3.addCallbacks(onRegisterTicketSuccess, onFail)
 
 
@@ -1730,7 +1730,8 @@ if __name__ == '__main__':
             public_key=config.get("webserver", "recaptcha_public_key"))
 
     exchange_info = { 'name': config.get("webserver", "exchange_name"),
-                      'feed_uri': config.get("webserver", "exchange_rss_feed")}
+                      'feed_uri': config.get("webserver", "exchange_rss_feed"),
+                      'google_analytics': config.get("webserver", "google_analytics")}
 
     factory = PepsiColaServerFactory(uri, base_uri, accountant, administrator, cashier, compropago, recaptcha,
                                      debugWamp=debug, debugCodePaths=debug, exchange_info=exchange_info)

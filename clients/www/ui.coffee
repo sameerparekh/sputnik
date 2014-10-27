@@ -44,6 +44,10 @@ $ ->
                 format_time: (datetime) ->
                     if datetime?
                         new Date(datetime/1000).toLocaleString()
+                format_price: (ticker, price) ->
+                    Number(price).toFixed(sputnik.getPricePrecision(ticker))
+                format_quantity: (ticker, quantity) ->
+                    Number(quantity).toFixed(sputnik.getQuantityPrecision(ticker))
                 clean_ticker: (ticker) ->
                     ticker.replace('/', '_')
                 values: (obj) -> (value for key, value of obj)
@@ -60,10 +64,18 @@ $ ->
                     if Object.keys(@get("sputnik.books") or {}).length == 0
                         return false
                     sputnik.canPlaceOrder @get("buy_quantity"), @get("buy_price"), @get("current_ticker"), "BUY"
+                buy_price_valid: ->
+                    sputnik.checkPriceValidity @get("current_ticker"), @get("buy_price")
+                buy_quantity_valid: ->
+                    sputnik.checkQuantityValidity @get("current_ticker"), @get("buy_quantity")
                 can_sell: ->
                     if Object.keys(@get("sputnik.books") or {}).length == 0
                         return false
                     sputnik.canPlaceOrder @get("sell_quantity"), @get("sell_price"), @get("current_ticker"), "SELL"
+                sell_price_valid: ->
+                    sputnik.checkPriceValidity @get("current_ticker"), @get("sell_price")
+                sell_quantity_valid: ->
+                    sputnik.checkQuantityValidity @get("current_ticker"), @get("sell_quantity")
 
             transitions:
                 show_chart: (t, ticker) ->
@@ -230,7 +242,8 @@ $ ->
                 if isNaN end_timestamp
                     end = new Date()
                     end.setDate(now.getDate())
-                    end_timestamp = end.getTime() * 1000
+                    # Add a day because we want the end of the day not the beginning
+                    end_timestamp = end.getTime() * 1000 + 3600 * 24 * 1000000
                     $('#transactions_end_date').val(end.toDateString())
 
                 sputnik.getTransactionHistory(start_timestamp, end_timestamp)
@@ -553,12 +566,11 @@ $ ->
             $('#change_password_token_modal').modal "show"
 
         sputnik.on "exchange_info", (exchange_info) ->
-          # Remove this once we have the code in the exchange_info
-          exchange_info.google_analytics = 'UA-46975613-2'
           ga('create', exchange_info.google_analytics, 'auto')
           ga('require', 'linkid', 'linkid.js')
           ga('require', 'displayfeatures')
           ga('send', 'pageview')
+          document.title = exchange_info.name
 
         sputnik.on "change_password_fail", (err) -> #BUG: this is not firing multiple times
             ga('send', 'event', 'password', 'change_password_fail', 'error', err[1])
@@ -648,6 +660,8 @@ $ ->
             return objectData
 
         @compliance_client_handler = (form) ->
+            ladda = Ladda.create $('#compliance_button')[0]
+            ladda.start()
             fd = new FormData()
             fd.append('username', ractive.get("sputnik.username"))
             passports = form.find('input[name=passport]')[0].files
@@ -674,9 +688,11 @@ $ ->
                     contentType: false,
                     type: 'POST',
                     success: (data) ->
+                        ladda.stop()
                         ga('send', 'event', 'compliance', 'save')
                         bootbox.alert("Successfully saved:" + data)
                     error: (err) ->
+                        ladda.stop()
                         ga('send', 'event', 'compliance', 'failure', 'error', err)
                         bootbox.alert("Error while saving:" + err)
                         sputnik.log ["Error:", err]

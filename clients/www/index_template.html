@@ -168,35 +168,35 @@
                                                     </select>
                                                     <table class="table-header">
                                                         <tr>
-                                                            <td class="recent-price-content">Open</td><td class="recent-price-content2">{{sputnik.ohlcv[current_ticker][ohlcv_period].open}}</td>
+                                                            <td class="recent-price-content">Open</td><td class="recent-price-content2">{{format_price(current_ticker, sputnik.ohlcv[current_ticker][ohlcv_period].open)}}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="recent-price-content">High</td><td class="recent-price-content2">{{sputnik.ohlcv[current_ticker][ohlcv_period].high}}</td>
+                                                            <td class="recent-price-content">High</td><td class="recent-price-content2">{{format_price(current_ticker, sputnik.ohlcv[current_ticker][ohlcv_period].high)}}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="recent-price-content">Low</td><td class="recent-price-content2">{{sputnik.ohlcv[current_ticker][ohlcv_period].low}}</td>
+                                                            <td class="recent-price-content">Low</td><td class="recent-price-content2">{{format_price(current_ticker, sputnik.ohlcv[current_ticker][ohlcv_period].low)}}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="recent-price-content">Close</td><td class="recent-price-content2">{{sputnik.ohlcv[current_ticker][ohlcv_period].close}}</td>
+                                                            <td class="recent-price-content">Close</td><td class="recent-price-content2">{{format_price(current_ticker, sputnik.ohlcv[current_ticker][ohlcv_period].close)}}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="recent-price-content">VWAP</td><td class="recent-price-content2">{{sputnik.ohlcv[current_ticker][ohlcv_period].vwap}}</td>
+                                                            <td class="recent-price-content">VWAP</td><td class="recent-price-content2">{{format_price(current_ticker, sputnik.ohlcv[current_ticker][ohlcv_period].vwap)}}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="recent-quantity-content">Volume</td><td class="recent-price-content2">{{sputnik.ohlcv[current_ticker][ohlcv_period].volume}}</td>
+                                                            <td class="recent-quantity-content">Volume</td><td class="recent-price-content2">{{format_quantity(current_ticker, sputnik.ohlcv[current_ticker][ohlcv_period].volume)}}</td>
                                                         </tr>
                                                     </table>
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <table class="table-header">
                                                         <tr>
-                                                            <td class="recent-price-content">Last</td><td class="recent-price-content2">{{sputnik.trade_history[current_ticker][0].price}}</td>
+                                                            <td class="recent-price-content">Last</td><td class="recent-price-content2">{{format_price(current_ticker, sputnik.trade_history[current_ticker][0].price)}}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="recent-price-content">Bid</td><td class="recent-price-content2">{{sputnik.books[current_ticker].best_bid.price}}</td>
+                                                            <td class="recent-price-content">Bid</td><td class="recent-price-content2">{{format_price(current_ticker, sputnik.books[current_ticker].best_bid.price)}}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="recent-price-content">Ask</td><td class="recent-price-content2">{{sputnik.books[current_ticker].best_ask.price}}</td>
+                                                            <td class="recent-price-content">Ask</td><td class="recent-price-content2">{{format_price(current_ticker, sputnik.books[current_ticker].best_ask.price)}}</td>
                                                         </tr>
                                                     </table>
                                                 </div>
@@ -207,13 +207,20 @@
                                             <div class="row">
                                                 {{#if sputnik.markets[current_ticker].contract_type == "cash_pair"}}
                                                 <div id="cash_pair-balance" class="col-xs-6">
-                                                    <div class="col-xs-12 col-sm-6 contract-overview-info2">
-                                                            <p class="grey-header" id="denominated_ticker">{{sputnik.markets[current_ticker].denominated_contract_ticker}}</p>
-                                                            <p class="first-line2" id="denominated_balance">{{sputnik.positions[sputnik.markets[current_ticker].denominated_contract_ticker].position_fmt}}</p>
+                                                    <div class="row">
+                                                        <div class="col-xs-12" class="grey-header" align="center">
+                                                            AVAILABLE TO TRADE
+                                                        </div>
                                                     </div>
-                                                    <div class="col-xs-12 col-sm-6 contract-overview-info2">
-                                                            <p class="grey-header" id="payout_ticker">{{sputnik.markets[current_ticker].payout_contract_ticker}}</p>
-                                                            <p class="first-line2" id="payout_balance">{{sputnik.positions[sputnik.markets[current_ticker].payout_contract_ticker].position_fmt}}</p>
+                                                    <div class="row">
+                                                        <div class="col-xs-12 col-sm-6 contract-overview-info2">
+                                                                <p class="grey-header" id="denominated_ticker">{{sputnik.markets[current_ticker].denominated_contract_ticker}}</p>
+                                                                <p class="first-line2" id="denominated_balance">{{format_quantity(sputnik.markets[current_ticker].denominated_contract_ticker, sputnik.positions[sputnik.markets[current_ticker].denominated_contract_ticker].position - (sputnik.markets[current_ticker].denominated_contract_ticker == "BTC" ? sputnik.margin[1] : sputnik.cash_spent[sputnik.markets[current_ticker].denominated_contract_ticker]))}}</p>
+                                                        </div>
+                                                        <div class="col-xs-12 col-sm-6 contract-overview-info2">
+                                                                <p class="grey-header" id="payout_ticker">{{sputnik.markets[current_ticker].payout_contract_ticker}}</p>
+                                                                <p class="first-line2" id="payout_balance">{{format_quantity(sputnik.markets[current_ticker].payout_contract_ticker, sputnik.positions[sputnik.markets[current_ticker].payout_contract_ticker].position - (sputnik.markets[current_ticker].payout_contract_ticker == "BTC" ? sputnik.margin[1] : sputnik.cash_spent[sputnik.markets[current_ticker].payout_contract_ticker]))}}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 {{else}}
@@ -221,21 +228,21 @@
                                                     <div class="row">
                                                         <div class="col-xs-12 col-sm-6 contract-overview-info2">
                                                             <p class="grey-header" id="btc_ticker">{{sputnik.markets[current_ticker].denominated_contract_ticker}}</p>
-                                                            <p class="first-line2" id="btc_balance">{{sputnik.positions[sputnik.markets[current_ticker].denominated_contract_ticker].position_fmt}}</p>
+                                                            <p class="first-line2" id="btc_balance">{{format_quantity(sputnik.markets[current_ticker].denominated_contract_ticker, sputnik.positions[sputnik.markets[current_ticker].denominated_contract_ticker].position)}}</p>
                                                         </div>
                                                         <div class="col-xs-12 col-sm-6 contract-overview-info2">
                                                             <p class="grey-header" id="contract_ticker">{{current_ticker}}</p>
-                                                            <p class="first-line2" id="contract_balance">{{sputnik.positions[current_ticker].position_fmt}}</p>
+                                                            <p class="first-line2" id="contract_balance">{{format_quantity(current_ticker, sputnik.positions[current_ticker].position)}}</p>
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-xs-12 col-sm-6 contract-overview-info2">
                                                             <p class="grey-header">LOW MARGIN</p>
-                                                            <p class="first-line2" id="low_margin">{{sputnik.margin[0]}}</p>
+                                                            <p class="first-line2" id="low_margin">{{format_quantity('BTC', sputnik.margin[0])}}</p>
                                                         </div>
                                                         <div class="col-xs-12 col-sm-6 contract-overview-info2">
                                                             <p class="grey-header">HIGH MARGIN</p>
-                                                            <p class="first-line2" id="high_margin">{{sputnik.margin[1]}}</p>
+                                                            <p class="first-line2" id="high_margin">{{format_quantity('BTC', sputnik.margin[1])}}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -261,7 +268,8 @@
                                                             <p>Price</p>
 
                                                             <form class="content-push7">
-                                                                    <input type="text" id="buy_price" name="price" class="form-control field" value="{{buy_price_str}}" placeholder="{{sputnik.books[current_ticker].best_ask.price}}" on-keyup="buykey">
+                                                                    <input type="text" id="buy_price" name="price" class="form-control field" value="{{buy_price_str}}"
+                                                                           placeholder="{{format_price(current_ticker, sputnik.books[current_ticker].best_ask.price)}}" on-keyup="buykey">
                                                             </form>
                                                         </div>
                                                         <div class="col-sm-6 quantity">
@@ -272,10 +280,14 @@
                                                         </div>
                                                     </div>
                                                     <div class="row spacer-top">
-                                                        {{#if can_buy}}
+                                                        {{#if can_buy and buy_price_valid and buy_quantity_valid}}
                                                         <a href="#" class="button-link-box3 button-place" id="buyButton" on-click="buy">Buy</a>
                                                         {{else}}
-                                                        <div class="alert alert-danger text-center alert-warning" id="buy_alert">Your balance is too low for this order.</div>
+                                                        <div class="alert alert-danger text-center alert-warning" id="buy_alert">
+                                                            {{#if not can_buy}}Insufficient Funds{{/if}}
+                                                            {{#if not buy_price_valid}}Price Invalid{{/if}}
+                                                            {{#if not buy_quantity_valid}}Quantity Invalid{{/if}}                                                            
+                                                        </div>
                                                         {{/if}}
                                                     </div>
                                                 </div>
@@ -293,6 +305,8 @@
                                                         <div class="col-sm-6">
                                                             <p>Price</p>
                                                             <form class="content-push7">
+                                                                    <input type="text" id="sell_price" name="price" class="form-control field" value="{{sell_price_str}}"
+                                                                           placeholder="{{format_price(current_ticker, sputnik.books[current_ticker].best_bid.price)}}" on-keyup="sellkey">
                                                                     <input type="text" id="sell_price" name="price" class="form-control field" value="{{sell_price_str}}" placeholder="{{sputnik.books[current_ticker].best_bid.price}}">
                                                             </form>
                                                         </div>
@@ -305,10 +319,14 @@
                                                         </div>
                                                     </div>
                                                     <div class="row spacer-top">
-                                                        {{#if can_sell}}
+                                                        {{#if can_sell && sell_price_valid && sell_quantity_valid}}
                                                         <a href="#" class="button-link-box3 button-place" id="sellButton" on-click="sell">Sell</a>
                                                         {{else}}
-                                                        <div class="alert alert-danger text-center alert-warning" id="sell_alert">Your balance is too low for this order.</div>
+                                                        <div class="alert alert-danger text-center alert-warning" id="sell_alert">
+                                                            {{#if not can_sell}}Insufficient Funds{{/if}}
+                                                            {{#if not sell_price_valid}}Price Invalid{{/if}}
+                                                            {{#if not sell_quantity_valid}}Quantity Invalid{{/if}}                                                                                                                        
+                                                        </div>
                                                         {{/if}}
                                                     </div>
                                                 </div>
@@ -335,8 +353,8 @@
                                                         {{#sputnik.orders:id}}
                                                         {{#if contract == current_ticker}}
                                                         <tr>
-                                                            <td class="recent-price-content2">{{price}}</td>
-                                                            <td class="recent-quantity-content2">{{quantity_left}}</td>
+                                                            <td class="recent-price-content2">{{format_price(current_ticker, price)}}</td>
+                                                            <td class="recent-quantity-content2">{{format_quantity(current_ticker, quantity_left)}}</td>
                                                             <td class="recent-type-content">{{side}}</td>
                                                             <td class="recent-cancel-content"><button on-click='cancel_order:{{id}}' class="cancel-button"><img src="images/cancel.png"/></button></td>
                                                         </tr>
@@ -372,8 +390,8 @@
                                                 <tbody id="trades-tbody">
                                                     {{#sputnik.trade_history[current_ticker]}}
                                                     <tr>
-                                                        <td class="recent-price-content2">{{price}}</td>
-                                                        <td class="recent-quantity-content2">{{quantity}}</td>
+                                                        <td class="recent-price-content2">{{format_price(current_ticker, price)}}</td>
+                                                        <td class="recent-quantity-content2">{{format_quantity(current_ticker, quantity)}}</td>
                                                         <td class="recent-time-content">{{timestamp}}</td>
                                                     </tr>
                                                     {{/}}
@@ -397,8 +415,8 @@
                                                         <tbody>
                                                             {{#sputnik.books[current_ticker].bids:i}}
                                                             <tr class="{{i == 0 ? 'alert-success' : '' }}">
-                                                                <td class="recent-price-content2">{{price}}</td>
-                                                                <td class="recent-quantity-content2">{{quantity}}</td>
+                                                                <td class="recent-price-content2">{{format_price(current_ticker, price)}}</td>
+                                                                <td class="recent-quantity-content2">{{format_quantity(current_ticker, quantity)}}</td>
                                                             </tr>
                                                             {{/}}
                                                         </tbody>
@@ -416,8 +434,8 @@
                                                         <tbody>
                                                             {{#sputnik.books[current_ticker].asks:i}}
                                                             <tr class="{{i == 0 ? 'alert-success' : '' }}">
-                                                                <td class="recent-price-content2">{{price}}</td>
-                                                                <td class="recent-quantity-content2">{{quantity}}</td>
+                                                                <td class="recent-price-content2">{{format_price(current_ticker, price)}}</td>
+                                                                <td class="recent-quantity-content2">{{format_quantity(current_ticker, quantity)}}</td>
                                                             </tr>
                                                             {{/}}
                                                         </tbody>
@@ -527,8 +545,8 @@
                                             <tr class="cells">
                                                 <td class="cell-contract">{{contract}}</td>
                                                 <td class="cell-type2">{{side}}</td>
-                                                <td class="cell-price">{{price}}</td>
-                                                <td class="cell-quantity">{{quantity_left}}</td>
+                                                <td class="cell-price">{{format_price(contract, price)}}</td>
+                                                <td class="cell-quantity">{{format_quantity(contract, quantity_left)}}</td>
                                                 <td class="cell-timestamp">{{timestamp}}</td>
                                                 <td class="cell-cancel">&nbsp;&nbsp;<button on-click='cancel_order:{{id}}' class="cancel-button"><img src="images/cancel.png"/></button></td>
                                             </tr>
@@ -620,7 +638,7 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <p class="text-balance">{{current_currency}} Balance:</p>
-                                            <p class="text-balance"> <strong>{{sputnik.positions[current_currency].position}}</strong></p>
+                                            <p class="text-balance"> <strong>{{format_quantity(current_currency, sputnik.positions[current_currency].position)}}</strong></p>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -675,10 +693,10 @@
                                     <div class="row">
                                         <div class="col-sm-3">
                                             <p class="text-balance">{{current_currency}} Balance:</p>
-                                            <p class="text-balance"> <strong>{{sputnik.positions[current_currency].position}}</strong></p>
+                                            <p class="text-balance"> <strong>{{format_quantity(current_currency, sputnik.positions[current_currency].position)}}</strong></p>
                                         </div>
                                         <div class="col-sm-4">
-                                            <p class="text-balance">{{current_currency}} Balance Available for Withdrawal:</p> <p class="text-balance"><strong>{{sputnik.positions[current_currency].position - (current_currency == "BTC" ? sputnik.margin[1] : sputnik.cash_spent[current_currency])}}</strong></p>
+                                            <p class="text-balance">{{current_currency}} Balance Available for Withdrawal:</p> <p class="text-balance"><strong>{{format_quantity(current_currency, sputnik.positions[current_currency].position - (current_currency == "BTC" ? sputnik.margin[1] : sputnik.cash_spent[current_currency]))}}</strong></p>
                                         </div>
                                     </div>
                                    
@@ -689,12 +707,15 @@
                                                     <p>Withdrawal Amount</p>
                                                 </div>
                                                 <div class="col-sm-7">
-                                                    <input class="form-control" type="text" id="withdraw-amount">
+                                                    <input class="form-control" type="text" id="withdraw-amount" value="{{withdrawal_amount}}">
+                                                    {{#if withdrawal_amount > sputnik.positions[current_currency].position - (current_currency == "BTC" ? sputnik.margin[1] : sputnik.cash_spent[current_currency])}}
+                                                    <div class="alert alert-danger alert-warning text-center">Insufficient Funds</div>
+                                                    {{/if}}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
+                                    {{#if withdrawal_amount <= sputnik.positions[current_currency].position - (current_currency == "BTC" ? sputnik.margin[1] : sputnik.cash_spent[current_currency])}}
                                     {{#if current_currency == "BTC"}}
                                     <div class="row">
                                         <div class="col-sm-5 deposit-content">
@@ -719,13 +740,12 @@
                                                     
                                                 </div>
                                                 <div class="col-sm-7">
-                                                <a href="#" class="button-link-box2" on-click="withdraw:crypto">Withdraw</a>
+                                                    <a href="#" class="button-link-box2" on-click="withdraw:crypto">Withdraw</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     {{else}}
-                                    
                                     <div class="row">
                                         <div class="col-sm-5 deposit-content">
                                             <div class="col-sm-12 deposit-heading">
@@ -851,6 +871,7 @@
                                         </div>
                                     </div>
                                     {{/if}}
+                                    {{/if}}
                                     {{/current_currency}}
                                 </div>
                                 {{/if}}
@@ -928,9 +949,9 @@
                                                     <tr class="cells">
                                                         <td class="cell-date">{{timestamp}}</td>
                                                         <td class="cell-type">{{type}}</td>
-                                                        <td class="cell-debit">{{direction == "debit" ? quantity : ''}}</td>
-                                                        <td class="cell-credit">{{direction == "credit" ? quantity : ''}}</td>
-                                                        <td class="cell-balance">{{balance}}</td>
+                                                        <td class="cell-debit">{{direction == "debit" ? format_quantity(history_contract, quantity) : ''}}</td>
+                                                        <td class="cell-credit">{{direction == "credit" ? format_quantity(history_contract, quantity) : ''}}</td>
+                                                        <td class="cell-balance">{{format_quantity(history_contract, balance)}}</td>
                                                         <td class="cell-note">{{note}}</td>
                                                     </tr>
                                                     {{else}}
@@ -1125,7 +1146,7 @@
                                                 <div class="col-sm-5 spacer-bottom">
                                                 </div>
                                                 <div class="col-sm-7 spacer-bottom">
-                                                    <a href="#" class="button-link-box" on-click="submit_compliance">Submit</a>
+                                                    <a data-color="green" data-size="s" data-style="zoom-out" href="#" id="compliance_button" class="ladda-button button-link-box3" on-click="submit_compliance">Submit</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -1185,12 +1206,12 @@
                                                 {{#sputnik.audit[audit_tab][audit_contract].positions}}
                                                 <tr class="{{this[0] == sputnik.audit_hash ? 'cells highlight' : 'cells'}}">
                                                     <td class="cell-id">{{this[0]}}</td>
-                                                    <td class="cell-amount" align="right">{{this[1]}}</td>
+                                                    <td class="cell-amount" align="right">{{format_quantity(audit_contract, this[1])}}</td>
                                                 </tr>
                                                 {{/}}
                                                 <tr class="cells">
                                                     <th class="cell-id">TOTAL</th>
-                                                    <th class="cell-amount total-amount" align="right">{{sputnik.audit[audit_tab][audit_contract].total_fmt}}</th>
+                                                    <th class="cell-amount total-amount" align="right">{{format_quantity(audit_contract, sputnik.audit[audit_tab][audit_contract].total_fmt)}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
