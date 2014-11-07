@@ -68,8 +68,7 @@ PROFILE_NOT_SET = AutoDeployException("Profile not set.")
 
 class Instance:
     def __init__(self, customer=None, region=None, profile=None,
-                 key=None, verbose=False, safety=False, template=None,
-                 remote_command=None):
+                 key=None, verbose=False, safety=False, template=None):
         self.customer = customer
         self.region = region
         if profile == None:
@@ -79,7 +78,6 @@ class Instance:
         self.key = key
         self.verbose = verbose
         self.safety = safety
-        self.remote_command = remote_command
 
         self.default_region = "us-west-1"
 
@@ -90,9 +88,9 @@ class Instance:
         self.key_filename = join(self.prefix, "ssh_login_key.pem")
         self.db_pass_filename = join(self.prefix, "dbpassword.txt")
         self.server_key_filename = join(self.prefix, "ssh_server_key.pub")
-        self.profile_dir = join(self,prefix, "profile", self.customer)
+        self.profile_dir = join(self.prefix, "profile", self.customer)
         self.profile_ini = join(self.profile_dir, "profile.ini")
-        self.server_ssl_key_dir = join(self,profile_dir, "keys")
+        self.server_ssl_key_dir = join(self.profile_dir, "keys")
 
         # default uninstalled state
         self.deployed = False
@@ -413,17 +411,34 @@ class Instance:
                 if result.failed:
                     raise COMMAND_FAILED
 
-    def run(self):
+    def run(self, command):
         self.check()
         context = fabric.api.hide("everything")
         if self.verbose:
             context = fabric.api.show("everything")
 
         with context:
-            result = fabric.api.run(self.remote_command)
+            result = fabric.api.run(command)
             if result.failed:
                 raise COMMAND_FAILED
 
+        return result
+
+    def sudo(self, command):
+        self.check()
+        context = fabric.api.hide("everything")
+        if self.verbose:
+            context = fabric.api.show("everything")
+
+        with context:
+            result = fabric.api.sudo(command)
+            if result.failed:
+                raise COMMAND_FAILED
+
+        return result
+
+    def start(self):
+        return self.sudo("service supervisor start")
 
     def install(self, upgrade=False):
         self.check()
@@ -445,8 +460,9 @@ class Instance:
                 parser.read(self.profile_ini)
                 if not parser.has_section("meta"):
                     parser.add_section("meta")
+                    parser.set("meta", "description", "")
+
                 parser.set("meta", "name", self.customer)
-                parser.set("meta", "description", "")
                 parser.set("meta", "inherits", self.base_profile)
                 if not parser.has_section("profile"):
                     parser.add_section("profile")
@@ -456,7 +472,7 @@ class Instance:
 
                 # If there are no keys, turn off SSL and use the AWS DNS
                 if not (os.path.isfile(os.path.join(self.server_ssl_key_dir, "server.key"))
-                        and os.path.isfile(os.path.join(self.server_ssl_key_dir, "server.cert"))
+                        and os.path.isfile(os.path.join(self.server_ssl_key_dir, "server.crt"))
                         and os.path.isfile(os.path.join(self.server_ssl_key_dir, "server.chain"))):
                     parser.set("profile", "use_ssl", "no")
                     parser.set("profile", "webserver_address", self.get_output("PublicDNS"))
@@ -592,13 +608,21 @@ def main():
     parser_install_clients = subparsers.add_parser("install_clients", parents=[customer],
                                                    help="Install python clients")
     parser_run = subparsers.add_parser("run", help="Run a command", parents=[customer])
-    parser_run = parser_run.add_argument("remote_command",
+    parser_run = parser_run.add_argument("args", nargs=argparse.REMAINDER,
                                          help="what is the remote command to run")
-
+    parser_sudo = subparsers.add_parser("sudo", help="Run a command as root", parents=[customer])
+    parser_sudo = parser_sudo.add_argument("args", nargs=argparse.REMAINDER,
+                                         help="what is the remote command to run")
+    parser_start = subparsers.add_parser("start", help="Start supervisor", parents=[customer])
 
     kwargs = vars(parser.parse_args())
     command = kwargs["command"]
     del kwargs["command"]
+
+    args = []
+    if "args" in kwargs:
+        args = kwargs["args"]
+        del kwargs["args"]
 
     if command == "list":
         return Instance.list(kwargs.get("region", None))
@@ -607,7 +631,9 @@ def main():
     method = getattr(instance, command)
 
     try:
-        method()
+        result = method(*args)
+        if result:
+            print result
     except AutoDeployException, e:
         print e
 
