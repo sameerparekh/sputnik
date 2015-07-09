@@ -52,7 +52,7 @@ class PostingGroup(uuid: UUID, count: Int) extends Actor with ActorLogging with 
     case PostingGroup.JournalPersisted =>
       context.parent ! Ledger.NewJournal(uuid, journal)
       postings.foreach(_._2 ! Poster.PostingResult(uuid, result = true))
-      //journal.postings.foreach(SputnikEventBus.publish)
+      journal.postings.foreach(SputnikEventBus.publish)
       context.stop(self)
   }
 
